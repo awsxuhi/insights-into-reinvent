@@ -105,6 +105,23 @@ def call_llm_with_retry(bedrock_runtime, model_id, messages):
         logger.error(f"Request payload: {json.dumps(messages, indent=2)}")
         raise
 
+# @retry(wait=wait_fixed(15), stop=stop_after_attempt(3))  # 15秒间隔，最多重试3次
+def call_sagemaker_llm_with_retry(sagemaker_runtime, sagemaker_endpoint, messages):
+    """使用重试机制调用大语言模型"""
+    try:
+        response = sagemaker_runtime.invoke_endpoint(
+            EndpointName=sagemaker_endpoint,
+            Body=json.dumps({
+                "messages": messages
+            }),
+            # contentType="application/json",
+        )
+        return json.loads(response['Body'].read())
+    except Exception as e:
+        logger.error(f"Error in LLM call: {str(e)}")
+        logger.error(f"Request payload: {json.dumps(messages, indent=2)}")
+        raise
+
 def generate_industry_insights(videos, model_config):
     """Generate insights for each industry"""
     # 初始化 Bedrock 客户端
@@ -247,6 +264,14 @@ def generate_overall_conclusion(industry_insights, model_config):
         region_name=AWS_REGION
     )
     
+    sagemaker_runtime = boto3.client(
+        service_name='sagemaker-runtime',
+        aws_access_key_id=AWS_ACCESS_KEY_ID,
+        aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
+        region_name=AWS_REGION
+    )
+    sagemaker_endpoint = "DMAA-Model-qwen2-5-0-5b-instruct-v1-endpoint"
+    
     # Prepare the prompt
     all_insights = "\n\n".join([
         f"<{insight['industry']} Industry> {insight['insights']} </{insight['industry']} Industry>"
@@ -284,28 +309,43 @@ def generate_overall_conclusion(industry_insights, model_config):
     """
     
     try:
+        # messages = [
+        #     {
+        #         "role": "user", 
+        #         "content": [
+        #             {
+        #                 "text": prompt
+        #             }
+        #         ]
+        #     }
+        # ]
+        
+        # logger.info(f"Request payload: {json.dumps(messages, indent=2)}")
+        
+        # response = call_llm_with_retry(
+        #     bedrock_runtime,
+        #     model_config['model_id'],
+        #     messages
+        # )
+        
+        # logger.info(f"Response received: {json.dumps(response, indent=2)}")
+        # conclusion = response["output"]["message"]["content"][0]["text"]
+
         messages = [
             {
                 "role": "user", 
-                "content": [
-                    {
-                        "text": prompt
-                    }
-                ]
+                "content": prompt
             }
         ]
-        
         logger.info(f"Request payload: {json.dumps(messages, indent=2)}")
-        
-        response = call_llm_with_retry(
-            bedrock_runtime,
-            model_config['model_id'],
+        logger.info("+++++++++ testing sagemaker +++++++++")
+        response = call_sagemaker_llm_with_retry(
+            sagemaker_runtime,
+            sagemaker_endpoint,
             messages
         )
-        
         logger.info(f"Response received: {json.dumps(response, indent=2)}")
-        conclusion = response["output"]["message"]["content"][0]["text"]
-
+        conclusion = response["choices"][0]["message"]["content"]
             
     except Exception as e:
         logger.error(f"Error in generate_overall_conclusion: {str(e)}")
