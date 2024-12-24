@@ -18,6 +18,7 @@ import boto3
 import json
 import time
 from tenacity import retry, wait_fixed, stop_after_attempt
+from src.model_manager import ModelManager
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
@@ -257,102 +258,53 @@ def step3_generate_insights(industry_videos, model_config, output_manager):
 
 def generate_overall_conclusion(industry_insights, model_config):
     """Generate overall conclusion across all industries"""
-    bedrock_runtime = boto3.client(
-        service_name='bedrock-runtime',
-        aws_access_key_id=AWS_ACCESS_KEY_ID,
-        aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
-        region_name=AWS_REGION
-    )
-    
-    sagemaker_runtime = boto3.client(
-        service_name='sagemaker-runtime',
-        aws_access_key_id=AWS_ACCESS_KEY_ID,
-        aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
-        region_name=AWS_REGION
-    )
-    sagemaker_endpoint = "DMAA-Model-qwen2-5-0-5b-instruct-v1-endpoint"
-    
-    # Prepare the prompt
-    all_insights = "\n\n".join([
-        f"<{insight['industry']} Industry> {insight['insights']} </{insight['industry']} Industry>"
-        for insight in industry_insights
-    ])
-    
-    prompt = f"""
-    Analyze the following industry-specific insights from AWS re:Invent videos and provide a comprehensive cross-industry analysis:
-
-    {all_insights}
-
-    Please provide a detailed analysis in the following format:
-
-    ### Cross-Industry Trends
-    - List major trends that appear across multiple industries
-    - Highlight common AWS services and solutions used
-
-    ### Industry-Specific Highlights
-    - Note unique or particularly innovative use cases by industry
-    - Identify industry-specific challenges and solutions
-
-    ### Key Technologies
-    - List the most frequently mentioned AWS services
-    - Describe how these services are being applied
-
-    ### Customer Success Patterns
-    - Identify common patterns in customer success stories
-    - Note any significant transformations or outcomes
-
-    ### Strategic Insights
-    - Provide strategic observations about AWS's industry focus
-    - Discuss emerging patterns and future directions
-
-    Please ensure the analysis is comprehensive yet concise, focusing on actionable insights.
-    """
-    
     try:
-        # messages = [
-        #     {
-        #         "role": "user", 
-        #         "content": [
-        #             {
-        #                 "text": prompt
-        #             }
-        #         ]
-        #     }
-        # ]
+        # Prepare the prompt
+        all_insights = "\n\n".join([
+            f"<{insight['industry']} Industry> {insight['insights']} </{insight['industry']} Industry>"
+            for insight in industry_insights
+        ])
         
-        # logger.info(f"Request payload: {json.dumps(messages, indent=2)}")
-        
-        # response = call_llm_with_retry(
-        #     bedrock_runtime,
-        #     model_config['model_id'],
-        #     messages
-        # )
-        
-        # logger.info(f"Response received: {json.dumps(response, indent=2)}")
-        # conclusion = response["output"]["message"]["content"][0]["text"]
+        prompt = f"""
+        Analyze the following industry-specific insights from AWS re:Invent videos and provide a comprehensive cross-industry analysis:
 
-        messages = [
-            {
-                "role": "user", 
-                "content": prompt
-            }
-        ]
-        logger.info(f"Request payload: {json.dumps(messages, indent=2)}")
-        logger.info("+++++++++ testing sagemaker +++++++++")
-        response = call_sagemaker_llm_with_retry(
-            sagemaker_runtime,
-            sagemaker_endpoint,
-            messages
-        )
-        logger.info(f"Response received: {json.dumps(response, indent=2)}")
-        conclusion = response["choices"][0]["message"]["content"]
-            
+        {all_insights}
+
+        Please provide a detailed analysis in the following format:
+
+        ### Cross-Industry Trends
+        - List major trends that appear across multiple industries
+        - Highlight common AWS services and solutions used
+
+        ### Industry-Specific Highlights
+        - Note unique or particularly innovative use cases by industry
+        - Identify industry-specific challenges and solutions
+
+        ### Key Technologies
+        - List the most frequently mentioned AWS services
+        - Describe how these services are being applied
+
+        ### Customer Success Patterns
+        - Identify common patterns in customer success stories
+        - Note any significant transformations or outcomes
+
+        ### Strategic Insights
+        - Provide strategic observations about AWS's industry focus
+        - Discuss emerging patterns and future directions
+
+        Please ensure the analysis is comprehensive yet concise, focusing on actionable insights.
+        """
+        
+        # Initialize model manager and generate response
+        model_manager = ModelManager()
+        # 使用 model_name 而不是 type
+        conclusion = model_manager.generate_response(model_config['name'], prompt)
+        
+        return conclusion
+        
     except Exception as e:
         logger.error(f"Error in generate_overall_conclusion: {str(e)}")
-        logger.error(f"Request payload: {json.dumps(messages, indent=2)}")
         raise
-    
-    return conclusion
 
 def step4_generate_conclusion(industry_insights, model_config, output_manager):
     """

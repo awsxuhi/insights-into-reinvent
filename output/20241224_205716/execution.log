@@ -1,0 +1,13 @@
+2024-12-24 20:57:16,993 - src.output_manager - INFO - Created log directory: output/20241224_205716
+2024-12-24 20:57:16,995 - googleapiclient.discovery_cache - INFO - file_cache is only supported with oauth2client<4.0.0
+2024-12-24 20:57:17,072 - __main__ - INFO - Found existing file: all_videos.csv
+2024-12-24 20:57:17,081 - __main__ - INFO - Using existing all_videos.csv
+2024-12-24 20:57:17,086 - __main__ - INFO - Found existing file: industry_videos.csv
+2024-12-24 20:57:17,087 - __main__ - INFO - Using existing industry_videos.csv
+2024-12-24 20:57:17,088 - __main__ - INFO - Found existing file: industry_insights.csv
+2024-12-24 20:57:17,089 - __main__ - INFO - Using existing industry_insights.csv
+2024-12-24 20:57:17,090 - __main__ - INFO - Generating overall conclusion...
+2024-12-24 20:57:17,094 - src.model_manager - INFO - Generating response using claude model
+2024-12-24 20:57:42,861 - src.output_manager - INFO - Text saved to output/conclusion.txt
+2024-12-24 20:57:42,862 - __main__ - INFO - Conclusion saved to TXT
+2024-12-24 20:57:42,862 - __main__ - INFO - All processing completed successfully
