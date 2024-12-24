@@ -1,9 +1,28 @@
-# This script is used to test download speeds of different pip sources
-# Run with: python test_pip_sources.py
+"""
+Test PIP Package Download Speed from Different Sources
+
+This script helps test and compare download speeds from different pip sources:
+- PyPI (Official)
+- Tsinghua Mirror (China)
+- Default configured source
+
+Usage:
+    python test_pip_sources.py
+
+The script will:
+1. Check your current default pip source
+2. Test download speed for a specific package from each source
+3. Display results sorted by download speed
+4. Clean up by removing the test package after each test
+
+Note: 
+- Requires pip to be installed and accessible from command line
+- Internet connection required
+- Results may vary based on network conditions
+"""
+
 import subprocess
 import time
-import os
-import configparser
 import sys
 
 def get_default_pip_index():

@@ -24,16 +24,16 @@ MODEL_CONFIGS = {
         'name': 'claude',
         'type': 'bedrock',
         'model_id': 'us.anthropic.claude-3-5-sonnet-20241022-v2:0', # e.g., us.anthropic.claude-3-sonnet-20240229-v1:0 or us.anthropic.claude-3-5-sonnet-20241022-v2:0
-        'max_tokens': 4096,
+        'max_tokens': 4000,
         'anthropic_version': 'bedrock-2023-05-31',
         'content_type': 'application/json',
         'accept': 'application/json'
     },
     'qwen': {
-        'name': 'qwen',
+        'name': 'qwen', # https://qwenlm.github.io/blog/qwen2.5/ for more information about context length and output max tokens, 7B supports 128K context length and 8k output max tokens
         'type': 'sagemaker',
-        'endpoint_name': 'DMAA-Model-qwen2-5-0-5b-instruct-v1-endpoint',
-        'max_tokens': 2000,
+        'endpoint_name': 'DMAA-Model-qwen2-5-7b-instruct-endpoint',
+        'max_tokens': 4000, # 8196 is the max tokens for qwen2.5 7B
         'request_format': 'qwen'
     }
 }

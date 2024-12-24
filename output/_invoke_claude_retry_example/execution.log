@@ -1,0 +1,62 @@
+2024-12-24 23:34:31,552 - src.output_manager - INFO - Created log directory: output/20241224_233431
+2024-12-24 23:34:31,553 - googleapiclient.discovery_cache - INFO - file_cache is only supported with oauth2client<4.0.0
+2024-12-24 23:34:31,685 - __main__ - INFO - Found existing file: all_videos.csv
+2024-12-24 23:34:31,695 - __main__ - INFO - Using existing all_videos.csv
+2024-12-24 23:34:31,702 - __main__ - INFO - Found existing file: industry_videos.csv
+2024-12-24 23:34:31,704 - __main__ - INFO - Using existing industry_videos.csv
+2024-12-24 23:34:31,704 - __main__ - INFO - Generating industry-specific insights...
+2024-12-24 23:34:31,709 - __main__ - INFO - Generating insights for industry: ADM
+2024-12-24 23:34:31,709 - src.model_manager - INFO - Generating response using claude model
+2024-12-24 23:34:52,416 - __main__ - INFO - Successfully generated insights for ADM
+2024-12-24 23:34:52,416 - __main__ - INFO - Generating insights for industry: AES
+2024-12-24 23:34:52,416 - src.model_manager - INFO - Generating response using claude model
+2024-12-24 23:35:09,188 - __main__ - INFO - Successfully generated insights for AES
+2024-12-24 23:35:09,188 - __main__ - INFO - Generating insights for industry: AUT
+2024-12-24 23:35:09,188 - src.model_manager - INFO - Generating response using claude model
+2024-12-24 23:35:30,657 - __main__ - INFO - Successfully generated insights for AUT
+2024-12-24 23:35:30,657 - __main__ - INFO - Generating insights for industry: ENU
+2024-12-24 23:35:30,657 - src.model_manager - INFO - Generating response using claude model
+2024-12-24 23:35:57,767 - __main__ - INFO - Successfully generated insights for ENU
+2024-12-24 23:35:57,768 - __main__ - INFO - Generating insights for industry: FSI
+2024-12-24 23:35:57,768 - src.model_manager - INFO - Generating response using claude model
+2024-12-24 23:36:30,481 - __main__ - INFO - Successfully generated insights for FSI
+2024-12-24 23:36:30,481 - __main__ - INFO - Generating insights for industry: GAM
+2024-12-24 23:36:30,481 - src.model_manager - INFO - Generating response using claude model
+2024-12-24 23:36:55,081 - __main__ - INFO - Successfully generated insights for GAM
+2024-12-24 23:36:55,081 - __main__ - INFO - Generating insights for industry: HLS
+2024-12-24 23:36:55,081 - src.model_manager - INFO - Generating response using claude model
+2024-12-24 23:37:32,747 - __main__ - INFO - Successfully generated insights for HLS
+2024-12-24 23:37:32,747 - __main__ - INFO - Generating insights for industry: MAE
+2024-12-24 23:37:32,748 - src.model_manager - INFO - Generating response using claude model
+2024-12-24 23:37:54,841 - __main__ - INFO - Successfully generated insights for MAE
+2024-12-24 23:37:54,842 - __main__ - INFO - Generating insights for industry: MFG
+2024-12-24 23:37:54,842 - src.model_manager - INFO - Generating response using claude model
+2024-12-24 23:38:28,193 - __main__ - INFO - Successfully generated insights for MFG
+2024-12-24 23:38:28,193 - __main__ - INFO - Generating insights for industry: NFX
+2024-12-24 23:38:28,193 - src.model_manager - INFO - Generating response using claude model
+2024-12-24 23:39:04,756 - __main__ - INFO - Successfully generated insights for NFX
+2024-12-24 23:39:04,757 - __main__ - INFO - Generating insights for industry: RCG
+2024-12-24 23:39:04,757 - src.model_manager - INFO - Generating response using claude model
+2024-12-24 23:39:23,589 - __main__ - INFO - Successfully generated insights for RCG
+2024-12-24 23:39:23,589 - __main__ - INFO - Generating insights for industry: SPT
+2024-12-24 23:39:23,589 - src.model_manager - INFO - Generating response using claude model
+2024-12-24 23:39:29,563 - src.model_manager - ERROR - Error in Claude model call: An error occurred (ThrottlingException) when calling the InvokeModel operation (reached max retries: 4): Too many requests, please wait before trying again.
+2024-12-24 23:39:29,563 - src.model_manager - ERROR - Error in claude model call: An error occurred (ThrottlingException) when calling the InvokeModel operation (reached max retries: 4): Too many requests, please wait before trying again.
+2024-12-24 23:39:29,563 - src.model_manager - INFO - Finished call to 'src.model_manager.ModelManager.generate_response' after 5.974(s), this was the 1st time calling it.
+2024-12-24 23:39:29,563 - src.model_manager - INFO - Retrying src.model_manager.ModelManager.generate_response in 4.0 seconds as it raised ThrottlingException: An error occurred (ThrottlingException) when calling the InvokeModel operation (reached max retries: 4): Too many requests, please wait before trying again..
+2024-12-24 23:39:33,567 - src.model_manager - INFO - Generating response using claude model
+2024-12-24 23:39:56,057 - __main__ - INFO - Successfully generated insights for SPT
+2024-12-24 23:39:56,057 - __main__ - INFO - Generating insights for industry: TLC
+2024-12-24 23:39:56,057 - src.model_manager - INFO - Generating response using claude model
+2024-12-24 23:40:26,325 - __main__ - INFO - Successfully generated insights for TLC
+2024-12-24 23:40:26,325 - __main__ - INFO - Generating insights for industry: WPS
+2024-12-24 23:40:26,325 - src.model_manager - INFO - Generating response using claude model
+2024-12-24 23:41:04,088 - __main__ - INFO - Successfully generated insights for WPS
+2024-12-24 23:41:04,127 - src.output_manager - INFO - Data saved to output/industry_insights.csv
+2024-12-24 23:41:04,128 - src.output_manager - INFO - Saved columns: industry, video_count, video_titles, insights
+2024-12-24 23:41:04,129 - __main__ - INFO - Industry insights saved to CSV
+2024-12-24 23:41:04,129 - __main__ - INFO - Generating overall conclusion...
+2024-12-24 23:41:04,171 - src.model_manager - INFO - Generating response using claude model
+2024-12-24 23:41:28,650 - src.output_manager - INFO - Text saved to output/conclusion.txt
+2024-12-24 23:41:28,651 - __main__ - INFO - Conclusion saved to TXT
+2024-12-24 23:41:28,651 - __main__ - INFO - All processing completed successfully

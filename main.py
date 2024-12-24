@@ -1,23 +1,14 @@
 from src.youtube_client import YouTubeClient
 from src.video_processor import VideoProcessor
-from src.summarizer import VideoSummarizer
-from src.insight_generator import InsightGenerator
 from src.output_manager import OutputManager
 from config.config import (
     PLAYLIST_ID, 
     MODEL_CONFIGS, 
-    AWS_ACCESS_KEY_ID, 
-    AWS_SECRET_ACCESS_KEY, 
-    AWS_REGION
 )
 import pandas as pd
 import os
 import sys
 import logging
-import boto3
-import json
-import time
-from tenacity import retry, wait_fixed, stop_after_attempt
 from src.model_manager import ModelManager
 
 # Setup logging
@@ -86,54 +77,11 @@ def step2_filter_industry_videos(video_processor, videos, output_manager):
     output_manager.save_to_csv(industry_videos, 'industry_videos.csv')
     return industry_videos
 
-# 添加重试装饰器
-@retry(wait=wait_fixed(15), stop=stop_after_attempt(3))  # 15秒间隔，最多重试3次
-def call_llm_with_retry(bedrock_runtime, model_id, messages):
-    """使用重试机制调用大语言模型"""
-    try:
-        inf_params = {"maxTokens": 3000, "temperature": 0.2}
-        response = bedrock_runtime.converse(
-            modelId=model_id,
-            # contentType="application/json",
-            # accept="application/json",
-            inferenceConfig=inf_params,
-            messages=messages
-        )
-        return response
-    except Exception as e:
-        logger.error(f"Error in LLM call: {str(e)}")
-        logger.error(f"Model ID: {model_id}")
-        logger.error(f"Request payload: {json.dumps(messages, indent=2)}")
-        raise
-
-# @retry(wait=wait_fixed(15), stop=stop_after_attempt(3))  # 15秒间隔，最多重试3次
-def call_sagemaker_llm_with_retry(sagemaker_runtime, sagemaker_endpoint, messages):
-    """使用重试机制调用大语言模型"""
-    try:
-        response = sagemaker_runtime.invoke_endpoint(
-            EndpointName=sagemaker_endpoint,
-            Body=json.dumps({
-                "messages": messages
-            }),
-            # contentType="application/json",
-        )
-        return json.loads(response['Body'].read())
-    except Exception as e:
-        logger.error(f"Error in LLM call: {str(e)}")
-        logger.error(f"Request payload: {json.dumps(messages, indent=2)}")
-        raise
-
 def generate_industry_insights(videos, model_config):
     """Generate insights for each industry"""
-    # 初始化 Bedrock 客户端
-    bedrock_runtime = boto3.client(
-        service_name='bedrock-runtime',
-        aws_access_key_id=AWS_ACCESS_KEY_ID,
-        aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
-        region_name=AWS_REGION
-    )
+    model_manager = ModelManager()
     
-    # 按行业分组
+    # Group by industry
     industry_groups = {}
     for video in videos:
         industry = video['industry']
@@ -141,94 +89,73 @@ def generate_industry_insights(videos, model_config):
             industry_groups[industry] = []
         industry_groups[industry].append(video)
     
-    # 生成每个行业的洞察
+    # Generate insights for each industry
     industry_insights = []
     for industry, industry_videos in industry_groups.items():
-        logger.info(f"Generating insights for industry: {industry}")
-        
-        # 收集该行业所有视频的描述
-        descriptions = [f"<video {i+1}>title: {v['title']}\n\n description: {v['description']}</video {i+1}>" 
-               for i, v in enumerate(industry_videos)]
-        titles = [v['title'] for v in industry_videos]
-        
-        # 修改 prompt 格式
-        prompt = f"""
-        Analyze these AWS re:Invent videos related to {industry} industry:
+        try:
+            logger.info(f"Generating insights for industry: {industry}")
+            
+            # Collect descriptions for all videos in this industry
+            descriptions = [f"<video {i+1}>title: {v['title']}\n\n description: {v['description']}</video {i+1}>" 
+                   for i, v in enumerate(industry_videos)]
+            titles = [v['title'] for v in industry_videos]
+            
+            # Format the prompt
+            prompt = f"""
+            Analyze these AWS re:Invent videos related to {industry} industry:
 
-        Video Descriptions:
-        {'\n'.join(descriptions)}
+            Video Descriptions:
+            {'\n'.join(descriptions)}
 
-        Please provide a detailed analysis in the following format:
+            Please provide a detailed analysis in the following format:
 
-        ### Detailed Analysis
+            ### Detailed Analysis
 
-        **Video 1: (title of video 1)**
-        - **Use Case:** [Describe the main use case]
-        - **Solution:** [List the AWS solutions used]
-        - **Customer Story:** [Name the customer and brief description]
+            **Video 1: (title of video 1)**
+            - **Use Case:** [Describe the main use case]
+            - **Solution:** [List the AWS solutions used]
+            - **Customer Story:** [Name the customer and brief description]
 
-        **Video 2: (title of video 2)**
-        - **Use Case:** [Describe the main use case]
-        - **Solution:** [List the AWS solutions used]
-        - **Customer Story:** [Name the customer and brief description]
+            **Video 2: (title of video 2)**
+            - **Use Case:** [Describe the main use case]
+            - **Solution:** [List the AWS solutions used]
+            - **Customer Story:** [Name the customer and brief description]
 
         [Continue for all videos...]
 
-        ### Conclusion
+            ### Conclusion
 
         Provide a comprehensive conclusion about how the {industry} industry is leveraging AWS services, mentioning key trends, solutions, and customer examples.
 
-        Please ensure:
-        1. Each video analysis follows the exact format with Use Case, Solution, and Customer Story.
-        2. Solutions should specifically mention AWS services and technologies used.
-        3. The conclusion should synthesize the key insights across all videos.
-        4. Keep the analysis concise but informative.
-        """
-        
-        try:
-            # 准备消息
-            messages = [
-                {
-                    "role": "user", 
-                    "content": [
-                        {
-                            "text": prompt
-                        }
-                    ]
-                }
-            ]
+            Please ensure:
+            1. Each video analysis follows the exact format with Use Case, Solution, and Customer Story.
+            2. Solutions should specifically mention AWS services and technologies used.
+            3. The conclusion should synthesize the key insights across all videos.
+            4. Keep the analysis concise but informative.
+            """
             
-            # 添加详细的日志
-            logger.info(f"Request messages: {json.dumps(messages, indent=2)}")
-            
-            # 使用重试机制的函数调用
-            response = call_llm_with_retry(
-                bedrock_runtime,
-                model_config['model_id'],
-                messages
-            )
-            
-            # 解析响应
-            logger.info(f"Response: {json.dumps(response, indent=2)}")
-            insight = response["output"]["message"]["content"][0]["text"]
-            
-            # 添加到结果列表
-            industry_insights.append({
-                'industry': industry,
-                'video_count': len(industry_videos),
-                'video_titles': '\n'.join(titles),
-                'insights': insight
-            })
-            
-            # 在每次成功调用后添加延迟
-            logger.info(f"Waiting 5 seconds before next API call...")
-            time.sleep(5)
-            
+            try:
+                insight = model_manager.generate_response(model_config['name'], prompt)
+                
+                industry_insights.append({
+                    'industry': industry,
+                    'video_count': len(industry_videos),
+                    'video_titles': '\n'.join(titles),
+                    'insights': insight
+                })
+                
+                logger.info(f"Successfully generated insights for {industry}")
+                # logger.info(f"Waiting 5 seconds before next API call...")
+                # time.sleep(5)
+                
+            except Exception as e:
+                logger.error(f"Failed to generate insights for {industry} after all retries")
+                logger.error(f"Error details: {str(e)}")
+                raise  # Re-raise the exception to terminate the program
+                
         except Exception as e:
-            logger.error(f"Error generating insights for {industry}: {str(e)}")
-            logger.error(f"Request messages: {json.dumps(messages, indent=2)}")
-            logger.error(f"Model ID: {model_config['model_id']}")
-            continue
+            logger.error(f"Fatal error while processing {industry}: {str(e)}")
+            sys.exit(1)  # Terminate the program
     
     return industry_insights
 
@@ -297,7 +224,6 @@ def generate_overall_conclusion(industry_insights, model_config):
         
         # Initialize model manager and generate response
         model_manager = ModelManager()
-        # 使用 model_name 而不是 type
         conclusion = model_manager.generate_response(model_config['name'], prompt)
         
         return conclusion
