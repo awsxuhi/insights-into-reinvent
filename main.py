@@ -79,7 +79,7 @@ def step2_filter_industry_videos(video_processor, videos, output_manager):
 
 def generate_industry_insights(videos, model_config):
     """Generate insights for each industry"""
-    model_manager = ModelManager()
+    model_manager = ModelManager(model_config)
     
     # Group by industry
     industry_groups = {}
@@ -223,7 +223,7 @@ def generate_overall_conclusion(industry_insights, model_config):
         """
         
         # Initialize model manager and generate response
-        model_manager = ModelManager()
+        model_manager = ModelManager(model_config)
         conclusion = model_manager.generate_response(model_config['name'], prompt)
         
         return conclusion

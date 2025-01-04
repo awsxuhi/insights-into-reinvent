@@ -8,7 +8,40 @@ This project analyzes industry-related videos from AWS re:Invent, providing insi
 - Identifies industry-specific content using video metadata
 - Generates summaries and insights for each industry sector
 - Provides cross-industry analysis and trends
-- Supports multiple LLM models (Claude, Nova, and Qwen) for content analysis
+- Supports multiple LLM models:
+  - AWS Bedrock (Claude, Nova)
+  - AWS SageMaker (Qwen)
+  - OpenAI-compatible APIs (Deepseek)
+
+## Model Support
+
+### Currently Supported Models
+
+- **AWS Bedrock**
+  - Claude (Anthropic)
+  - Nova (Amazon)
+- **AWS SageMaker**
+  - Qwen
+- **OpenAI-compatible APIs**
+  - Deepseek
+
+### Adding New OpenAI-compatible Models
+
+To add support for a new OpenAI-compatible model, simply add its configuration to `config/config.py`:
+
+```python
+'new_model': {
+    'name': 'new_model',
+    'type': 'openai',  # Use 'openai' type for OpenAI-compatible APIs
+    'model_id': 'your-model-id',
+    'max_tokens': 4000,
+    'api_key': os.getenv('NEW_MODEL_API_KEY'),
+    'api_base': 'https://api.your-model.com',  # Optional: base URL for API
+    'temperature': 0.7
+}
+```
+
+The project will automatically handle the API calls using the OpenAI-compatible interface.
 
 ## Prerequisites
 
@@ -68,6 +101,7 @@ Or specify a different model:
 python main.py claude
 python main.py nova
 python main.py qwen
+python main.py deepseek
 ```
 
 ## Output Files
