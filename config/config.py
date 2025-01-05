@@ -53,6 +53,15 @@ MODEL_CONFIGS = {
         'temperature': 0.7,
         'base_url': 'https://api.deepseek.com'  # You can also use https://api.deepseek.com/v1
     },
+    'openrouter': {
+        'name': 'openrouter',
+        'type': 'openai',  
+        'model_id': 'deepseek/deepseek-chat-v1',  # call deepseek via openrouter
+        'max_tokens': 4000,
+        'api_key': os.getenv('OPENROUTER_API_KEY'),
+        'base_url': 'https://openrouter.ai/api/v1',
+        'temperature': 0.7
+    },
     # #add new Openai-compatible model here
     # 'new_model': {
     #     'name': 'new_model',

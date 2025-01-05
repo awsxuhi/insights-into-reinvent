@@ -1,0 +1,17 @@
+2025-01-05 10:21:05,904 - src.output_manager - INFO - Created log directory: output/20250105_102105
+2025-01-05 10:21:05,905 - googleapiclient.discovery_cache - INFO - file_cache is only supported with oauth2client<4.0.0
+2025-01-05 10:21:05,919 - botocore.credentials - INFO - Found credentials in shared credentials file: ~/.aws/credentials
+2025-01-05 10:21:06,023 - __main__ - INFO - Found existing file: all_videos.csv
+2025-01-05 10:21:06,033 - __main__ - INFO - Using existing all_videos.csv
+2025-01-05 10:21:06,036 - __main__ - INFO - Found existing file: industry_videos.csv
+2025-01-05 10:21:06,038 - __main__ - INFO - Using existing industry_videos.csv
+2025-01-05 10:21:06,038 - __main__ - INFO - Found existing file: industry_insights.csv
+2025-01-05 10:21:06,040 - __main__ - INFO - Using existing industry_insights.csv
+2025-01-05 10:21:06,041 - __main__ - INFO - Generating overall conclusion...
+2025-01-05 10:21:06,041 - src.model_manager - INFO - Initializing with base_url: https://openrouter.ai/api/v1
+2025-01-05 10:21:06,083 - src.model_manager - INFO - Successfully initialized OpenAI-compatible client for openrouter
+2025-01-05 10:21:06,083 - src.model_manager - INFO - Generating response using openrouter model
+2025-01-05 10:21:07,083 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-05 10:22:29,046 - src.output_manager - INFO - Text saved to output/conclusion.txt
+2025-01-05 10:22:29,046 - __main__ - INFO - Conclusion saved to TXT
+2025-01-05 10:22:29,046 - __main__ - INFO - All processing completed successfully

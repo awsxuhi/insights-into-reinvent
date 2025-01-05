@@ -12,6 +12,7 @@ This project analyzes industry-related videos from AWS re:Invent, providing insi
   - AWS Bedrock (Claude, Nova)
   - AWS SageMaker (Qwen)
   - OpenAI-compatible APIs (Deepseek)
+  - OpenRouter (access to multiple models through unified API)
 
 ## Model Support
 
@@ -24,6 +25,7 @@ This project analyzes industry-related videos from AWS re:Invent, providing insi
   - Qwen
 - **OpenAI-compatible APIs**
   - Deepseek
+  - OpenRouter (provides access to multiple models including Deepseek)
 
 ### Adding New OpenAI-compatible Models
 
@@ -102,6 +104,7 @@ python main.py claude
 python main.py nova
 python main.py qwen
 python main.py deepseek
+python main.py openrouter
 ```
 
 ## Output Files
